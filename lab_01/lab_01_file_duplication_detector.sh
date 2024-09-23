@@ -17,7 +17,7 @@
 #   가장 많이 중복된 파일들의 이름이 \n (new line)으로 구분되어 stdout으로 출력된다
 #
 # Example Usage:
-#   ./lab_01_file_duplication_detector.sh resources/detecting_duplicate_files/
+#   ./lab_01_file_duplication_detector.sh resources/detecting_duplicate_files
 
 
 usage()
@@ -27,7 +27,7 @@ usage()
 Usage: $script_name [PATH]
 Description: Check the files inside the [PATH] and print out list of filenames that is most frequently duplicated. Output file lists are separated by "\n"
 Example usage:
-    $script_name resources/detecting_duplicate_files/
+    $script_name resources/detecting_duplicate_files
 END
 
 }
@@ -42,5 +42,29 @@ directory=$1
 
 ##### YOUR CODE START #####  
 
+# 파일 목록과 그들의 md5 체크섬 값 가져오기
+declare -A file_map
+while IFS= read -r -d '' file; do
+    checksum=$(md5sum "$file" | awk '{ print $1 }')
+    file_map["$checksum"]+="$file "
+done < <(find "$directory" -type f ! -path "*/.ipynb_checkpoints/*" -print0)
+
+# 가장 많이 중복된 체크섬에 해당하는 파일 찾기
+max_count=0
+duplicate_files=""
+for files in "${file_map[@]}"; do
+    count=$(echo "$files" | wc -w)
+    if [ "$count" -gt "$max_count" ]; then
+        max_count=$count
+        duplicate_files="$files"
+    fi
+done
+
+# 결과 출력
+if [ -n "$duplicate_files" ]; then
+    echo "$duplicate_files" | tr ' ' '\n'
+else
+    echo "중복된 파일이 없습니다."
+fi
 
 ##### YOUR CODE END #####
