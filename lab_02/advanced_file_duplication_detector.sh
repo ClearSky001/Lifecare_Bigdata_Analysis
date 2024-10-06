@@ -26,4 +26,28 @@ directory=$1
 
 ##### YOUR CODE START #####  
 
+# 파일 목록과 그들의 md5 체크섬 값 가져오기
+declare -A file_map
+while IFS= read -r -d '' file; do
+    checksum=$(md5sum "$file" | awk '{ print $1 }')
+    file_map["$checksum"]+="$file "
+done < <(find "$directory" -type f -name "*.jpg" ! -path "*/.ipynb_checkpoints/*" -print0)
+
+# 중복 파일 정보 저장
+declare -A duplicate_counts
+declare -A duplicate_files
+for checksum in "${!file_map[@]}"; do
+    files="${file_map[$checksum]}"
+    count=$(echo "$files" | wc -w)
+    if [ "$count" -gt 1 ]; then  # 중복이 있는 경우만 저장
+        duplicate_counts["$checksum"]=$count
+        duplicate_files["$checksum"]="$files"
+    fi
+done
+
+# 중복 파일 수에 따라 정렬하여 출력
+for checksum in "${!duplicate_counts[@]}"; do
+    echo "${duplicate_counts[$checksum]} $checksum: ${duplicate_files[$checksum]}"
+done | sort -rn -k1
+
 ##### YOUR CODE END #####

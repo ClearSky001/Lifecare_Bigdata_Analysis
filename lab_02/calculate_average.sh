@@ -18,5 +18,5 @@ csv_file=$1
 result_file=$2
 
 ##### YOUR CODE START #####  
-
+awk -F, '{sum += $3} END {print sum/NR}' $csv_file > $result_file
 ##### YOUR CODE END #####
