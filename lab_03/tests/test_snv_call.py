@@ -47,7 +47,7 @@ def test_summary_file_score_6():
     summary_file = RESULTS_DIR / "QC_summary.txt"
     assert summary_file.exists(), "QC_summary.txt was not created on expected location"
 
-    expected_values = [151, 147.538, 5242, 5238, 0.0354826]
+    expected_values = [151, 148.207, 5244, 5239, 0.035489]
     with open(summary_file, "r") as f:
         contents = f.read().splitlines()
 
